@@ -12,21 +12,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Table (name = "event" ) //mapeia o nome da tabela
-@Entity //preciso dizer que ela e uma entidade, representando as entrada da minha tabela como obejetos
-
-//colocando anotaçoes via lombok para gera AUTO nosso gettes e setters
+@Table (name = "event" )
+@Entity
 @Setter
 @Getter
-
-//premite criar instancias
 @NoArgsConstructor
 @AllArgsConstructor
 
 public class Event {
 	
 	@Id
-	@GeneratedValue //para dizer que é um valor gerado pela minha propria tabela (Gerado AUTO a cada nova entrada na tabela)
+	@GeneratedValue
 	private UUID id;
 	private String title;
 	private String description;
