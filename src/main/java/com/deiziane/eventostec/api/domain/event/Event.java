@@ -26,8 +26,8 @@ public class Event {
 	private UUID id;
 	private String title;
 	private String description;
-	private String imgURL;
-	private String eventURL;
+	private String imgUrl;
+	private String eventUrl;
 	private Boolean remote;
 	private Date date;
 	
