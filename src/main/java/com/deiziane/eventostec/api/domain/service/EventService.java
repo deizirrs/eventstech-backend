@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.amazonaws.services.s3.AmazonS3;
 import com.deiziane.eventostec.api.domain.event.Event;
 import com.deiziane.eventostec.api.domain.event.EventRequestDTO;
+import com.deiziane.eventostec.api.domain.repositories.EventRepository;
 
 @Service
 public class EventService {
@@ -23,6 +24,9 @@ public class EventService {
 
 	@Autowired
 	private AmazonS3 s3client;
+	@Autowired
+	private EventRepository eventRepository;
+
 
 	public Event createEvent(EventRequestDTO data) {
 		String imgUrl = null;
@@ -39,7 +43,9 @@ public class EventService {
 		newEvent.setRemote(data.remote());
 		newEvent.setDate(new Date(data.date()));
 		newEvent.setImgUrl(imgUrl);
-		return newEvent;
+		
+	  Event savedEvent = eventRepository.save(newEvent);
+	  return savedEvent;
 	}
 
 	private String uploadImg(MultipartFile multipartFile) {
@@ -54,7 +60,7 @@ public class EventService {
 			return s3client.getUrl(bucketName, fileName).toString();
 		} catch (Exception e) {
 			System.out.println("Erro ao subir o arquivo.");
-			return null;
+			return "";
 		}
 
 	}
