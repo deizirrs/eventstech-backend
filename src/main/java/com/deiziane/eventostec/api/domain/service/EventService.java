@@ -34,7 +34,7 @@ public class EventService {
 
 
 	public Event createEvent(EventRequestDTO data) {
-		String imgUrl = null;
+		String imgUrl = "";
 
 		if (data.image() != null) {
 			imgUrl = this.uploadImg(data.image());
@@ -48,14 +48,14 @@ public class EventService {
 		newEvent.setRemote(data.remote());
 		newEvent.setDate(new Date(data.date()));
 		newEvent.setImgUrl(imgUrl);
-		
+
 	  Event savedEvent = eventRepository.save(newEvent);
 	  return savedEvent;
 	}
 
-	public List<EventResponseDTO> getEvents(int page, int size){
+	public List<EventResponseDTO> getUpComingEvents(int page, int size){
 		Pageable pageable = PageRequest.of(page, size);
-		Page<Event> eventsPage = this.eventRepository.findAll(pageable);
+		Page<Event> eventsPage = this.eventRepository.findUpComingEvents(new Date(), pageable);
 		return eventsPage.map(event -> new EventResponseDTO(
 											event.getId(),
 											event.getTitle(),
@@ -68,7 +68,7 @@ public class EventService {
 											event.getImgUrl()))
 											.stream().toList();
 	}
-	
+
 	private String uploadImg(MultipartFile multipartFile) {
 
 		String fileName = UUID.randomUUID() + "-" + multipartFile.getOriginalFilename();
