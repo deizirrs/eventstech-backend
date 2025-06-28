@@ -1,14 +1,15 @@
 package com.deiziane.eventostec.api.domain.service;
 
 
-import com.deiziane.eventostec.api.domain.event.Event;
 import java.util.Date;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.deiziane.eventostec.api.domain.coupon.Coupon;
 import com.deiziane.eventostec.api.domain.coupon.CouponRequestDTO;
+import com.deiziane.eventostec.api.domain.event.Event;
 import com.deiziane.eventostec.api.domain.repositories.CouponRepository;
 import com.deiziane.eventostec.api.domain.repositories.EventRepository;
 
@@ -21,18 +22,18 @@ public class CouponService {
 	@Autowired
 	private EventRepository eventRepository;
 
-	public Coupon createCoupon(CouponRequestDTO data) {
+	public Coupon createCoupon( UUID eventId, CouponRequestDTO couponData) {
 
-		Event event = eventRepository.findById(data.event_id())
-				.orElseThrow(() -> new RuntimeException("Evento não encontrado"));
+		Event event = eventRepository.findById(eventId)
+				.orElseThrow(() -> new IllegalArgumentException("Evento não encontrado"));
 
-		Coupon newCoupon = new Coupon();
-		newCoupon.setCode(data.code());
-		newCoupon.setDiscount(data.discount());
-		newCoupon.setValid(new Date(data.valid()));
-		newCoupon.setEvent(event);
+		Coupon coupon = new Coupon();
+		coupon.setCode(couponData.code());
+		coupon.setDiscount(couponData.discount());
+		coupon.setValid(new Date(couponData.valid()));
+		coupon.setEvent(event);
 		
-		return couponRepository.save(newCoupon);
+		return couponRepository.save(coupon);
 
 	}
 
