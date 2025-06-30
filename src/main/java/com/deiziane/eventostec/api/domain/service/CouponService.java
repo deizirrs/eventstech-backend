@@ -2,6 +2,7 @@ package com.deiziane.eventostec.api.domain.service;
 
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,7 @@ public class CouponService {
 	public Coupon createCoupon( UUID eventId, CouponRequestDTO couponData) {
 
 		Event event = eventRepository.findById(eventId)
-				.orElseThrow(() -> new IllegalArgumentException("Evento não encontrado"));
+				.orElseThrow(() -> new IllegalArgumentException("Event not found"));
 
 		Coupon coupon = new Coupon();
 		coupon.setCode(couponData.code());
@@ -35,6 +36,10 @@ public class CouponService {
 		
 		return couponRepository.save(coupon);
 
+	}
+	
+	public List<Coupon> consultCoupons(UUID eventId, Date currentDate){
+		return couponRepository.findByEventIdAndValidAfter(eventId, currentDate);
 	}
 
 }
