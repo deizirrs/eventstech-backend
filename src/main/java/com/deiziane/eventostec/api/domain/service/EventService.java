@@ -29,6 +29,10 @@ public class EventService {
 
 	@Autowired
 	private AmazonS3 s3client;
+	
+	@Autowired
+	private AddressService addressService;
+	
 	@Autowired
 	private EventRepository eventRepository;
 
@@ -50,25 +54,59 @@ public class EventService {
 		newEvent.setImgUrl(imgUrl);
 
 	  Event savedEvent = eventRepository.save(newEvent);
+	  
+	 if(!data.remote()) {
+		 this.addressService.createAddress(data, newEvent);
+	 }
+	  
 	  return savedEvent;
 	}
 
 	public List<EventResponseDTO> getUpComingEvents(int page, int size){
+		
 		Pageable pageable = PageRequest.of(page, size);
+		
 		Page<Event> eventsPage = this.eventRepository.findUpComingEvents(new Date(), pageable);
 		return eventsPage.map(event -> new EventResponseDTO(
 											event.getId(),
 											event.getTitle(),
 											event.getDescription(),
 											event.getDate(),
-											"",
-											"",
+											event.getAddress() != null ? event.getAddress().getCity(): "",
+											event.getAddress() != null ? event.getAddress().getUf(): "",
 											event.getRemote(),
 											event.getEventUrl(),
 											event.getImgUrl()))
 											.stream().toList();
 	}
 
+	public List<EventResponseDTO> getFilteredEvents(int page, int size, String title, String city, String uf, Date startDate, Date endDate){
+		
+	    city = (city != null) ? city : "";
+	    uf = (uf != null) ? uf : "";
+	    title = (title != null) ? title : "";
+	    startDate = (startDate != null) ? startDate : new Date(0);
+	    endDate = (endDate != null) ? endDate : new Date();
+
+				
+		Pageable pageable = PageRequest.of(page, size);
+		
+		Page<Event> eventsPage = this.eventRepository.findFilteredEvents(title, city, uf, startDate, endDate, pageable);
+
+		return eventsPage.map(event -> new EventResponseDTO(
+											event.getId(),
+											event.getTitle(),
+											event.getDescription(),
+											event.getDate(),
+											event.getAddress() != null ? event.getAddress().getCity(): "",
+											event.getAddress() != null ? event.getAddress().getUf(): "",
+											event.getRemote(),
+											event.getEventUrl(),
+											event.getImgUrl()))
+											.stream().toList();
+	}
+
+	
 	private String uploadImg(MultipartFile multipartFile) {
 
 		String fileName = UUID.randomUUID() + "-" + multipartFile.getOriginalFilename();
